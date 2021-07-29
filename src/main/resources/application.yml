@@ -1,0 +1,54 @@
+server:
+  port: 9000
+mapping:
+  stockPath: /api/v1.0/market/stock
+  companyPath: /api/v1.0/market/company
+  userPath: /api/v1.0/market/user
+  stockBase: http://localhost:8082
+  companyBase: http://localhost:8081
+  companyStockBase: http://localhost:8083
+  userBase: http://localhost:8084
+spring:
+  application:
+    name: gateway-service
+  cloud:
+    gateway:
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - DELETE
+      routes:
+        - id: companyInfo
+          uri: ${mapping.companyStockBase}
+          predicates:
+            - Path=${mapping.companyPath}/info/{companycode}
+        - id: delete
+          uri: ${mapping.companyStockBase}
+          predicates:
+            -  Path=${mapping.companyPath}/delete/{companycode}
+        - id: getall
+          uri: ${mapping.companyStockBase}
+          predicates:
+            - Path=${mapping.companyPath}/getall
+        - id: stock-service
+          uri: ${mapping.stockBase}
+          predicates:
+            - Path=${mapping.stockPath}/**
+        - id: company-service
+          uri: ${mapping.companyBase}
+          predicates:
+            - Path=${mapping.companyPath}/**
+        - id: user-service
+          uri: ${mapping.userBase}
+          predicates:
+            - Path=${mapping.userPath}/**
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
